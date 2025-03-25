@@ -15,10 +15,15 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <!-- TestNG -->
         <testng.version>7.10.2</testng.version>
         <test.suite>src/test/resources/test-suites/github/test-suite.xml</test.suite>
 
+        <!-- RestAssured -->
         <restassured.version>5.3.0</restassured.version>
+
+        <!-- SLF4J -->
+        <slf4j.version>2.0.17</slf4j.version>
     </properties>
 
     <dependencies>
@@ -33,14 +38,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.32</version>
+            <version>${slf4j.version}</version>
         </dependency>
-
-        <!-- SLF4J with Logback binding -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.4.12</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <!-- RestAssured for API testing -->
@@ -49,6 +52,8 @@
             <artifactId>rest-assured</artifactId>
             <version>${restassured.version}</version>
         </dependency>
+
+        <!-- JSON -->
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
@@ -59,28 +64,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.commonjava.maven.plugins</groupId>
-                <artifactId>directory-maven-plugin</artifactId>
-                <version>0.3.1</version>
-                <executions>
-                    <execution>
-                        <id>directories</id>
-                        <goals>
-                            <goal>directory-of</goal>
-                        </goals>
-                        <phase>initialize</phase>
-                        <configuration>
-                            <property>lowestBaseDir</property>
-                            <project>
-                                <groupId>com.mend</groupId>
-                                <artifactId>mend-assignment</artifactId>
-                            </project>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
+                <!-- Maven Surefire Plugin -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M5</version>
@@ -94,17 +78,6 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
-
         </plugins>
     </build>
 </project>
