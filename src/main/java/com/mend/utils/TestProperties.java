@@ -41,18 +41,34 @@ public class TestProperties {
     }
 
     public static String getBaseUrl() {
-        return properties.getProperty(Key.BASE_URL.getKey(), "https://api.github.com");
+        String property = System.getProperty(Key.BASE_URL.getKey());
+        if (property == null) {
+            property = properties.getProperty(Key.BASE_URL.getKey(), "https://api.github.com");
+        }
+        return property;
     }
 
     public static String getAccessToken() {
-        return properties.getProperty(Key.ACCESS_TOKEN.getKey());
+        String property = System.getProperty(Key.ACCESS_TOKEN.getKey());
+        if (property == null) {
+            property = properties.getProperty(Key.ACCESS_TOKEN.getKey());
+        }
+        return property;
     }
 
     public static String getRepoUserName() {
-        return properties.getProperty(Key.REPO_USERNAME.getKey(), "GitHubUserNameDefault");
+        String property = System.getProperty(Key.REPO_USERNAME.getKey());
+        if (property == null) {
+            property = properties.getProperty(Key.REPO_USERNAME.getKey(), "UserNameDefault");
+        }
+        return property;
     }
 
     public static int getResponseTimeThresholdInMilli() {
-        return Integer.parseInt(properties.getProperty(Key.RESPONSE_THRESHOLD.getKey(), "3000"));
+        String property = System.getProperty(Key.RESPONSE_THRESHOLD.getKey());
+        if (property == null) {
+            property = properties.getProperty(Key.RESPONSE_THRESHOLD.getKey(), "3000");
+        }
+        return Integer.parseInt(property);
     }
 }

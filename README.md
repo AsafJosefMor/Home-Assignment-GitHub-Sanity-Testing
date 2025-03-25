@@ -10,7 +10,7 @@ This project contains automated tests for GitHub API functionality, including:
 - Repository deletion (cleanup)
 - Response times are validated against a threshold
 
-Tests are written using **TestNG** and utilize **RestAssured** for API testing.  
+ Tests are written using **TestNG** and utilize **RestAssured** for API testing.  
 Maven is used for dependency management and test execution.
 
 ## Setup & Configuration
@@ -24,10 +24,10 @@ Maven is used for dependency management and test execution.
 - To create a personal access token, visit [GitHub Personal Access Tokens](https://github.com/settings/personal-access-tokens/new), choose **"All repositories"**.
 - Grant Repository permissions - Administration (Read & Write).
 
-### 3. Configuring Properties
+### 3. Configuring Properties or run Maven with `-D` parameters
 
-#### Internal for local testing (`src/test/resources/Properties/test.properties` - is the default properties file, a duplicate was created as an example to specific properties for different environments)
-The test properties can be configured inside `test.properties` and will be ignored by Git:
+`src/test/resources/Properties/test.properties` - is the default properties file, duplicates were created as an example for specific properties for different environments (same for test-suites)
+The test properties can be configured inside `test.properties`:
 ```
 base.url=https://api.github.com
 github.token=your_personal_access_token
@@ -47,13 +47,12 @@ To execute all tests, simply run:
 ```
 mvn test
 ```
+To execute all tests with injected properties, for instance, you can run:
+```
+mvn test -Daccess.token=your_personal_access_token -Drepo.username=your_github_username
+```
 
-## Scope
-- Directories for GitLab and Azure was created for example of extendability.
-- `CONTRIBUTING.md` was not implemented.
-- Code style rules are not implemented - a `CODING-STYLE.md` file exist for example.
-- Tests will fail if GitHub API rate limits are exceeded (a retry mechanism is out of scope).
-- The repository created during the tests is automatically deleted after execution.
+## Scope and Limitations
 - This quick sanity prioritizes test time performance.
-- For this solution, a personal access token is used, but in a real-world scenario, it should be stored securely and not hardcoded in the properties file (more information under [GitHub: managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)).
-
+- Tests will fail if GitHub API rate limits are exceeded.
+- The repository created during the tests is automatically deleted after execution.

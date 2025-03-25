@@ -2,39 +2,40 @@ package com.mend.api;
 
 import com.mend.core.enums.ApiHeaders;
 import com.mend.core.enums.GitHubApiPaths;
-import com.mend.utils.TestProperties;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
 
-public class GitHubApi {
-    private static final String BASE_URL = TestProperties.getBaseUrl();
-    private static final String TOKEN_PREFIX = "token ";
-
+/**
+ * Implementation of ApiClientInterface for GitHub API interactions.
+ * This class provides methods to interact with GitHub's API, including authentication,
+ * repository management, issue management, and code search.
+ */
+public class GitHubApiClient implements IApiClient {
     /**
      * Logs in to GitHub using the provided access token.
      *
-     * @param githubToken the GitHub access token
      * @return Response object with the response data
      */
-    public static Response login(String githubToken) {
+    @Override
+    public Response login() {
         return given()
-                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), TOKEN_PREFIX + githubToken)
+                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), ApiHeaders.TOKEN_PREFIX.getHeaderName() + ACCESS_TOKEN)
                 .when()
-                .get(BASE_URL + "/user");
+                .get(BASE_URL + GitHubApiPaths.USER.getPath());
     }
 
     /**
      * Creates a new repository.
      *
      * @param repoName    the name of the repository
-     * @param githubToken the GitHub access token
      * @return Response object with the response data
      */
-    public static Response createRepository(String repoName, String githubToken) {
+    @Override
+    public Response createRepository(String repoName) {
         String requestBody = "{\"name\": \"" + repoName + "\", \"private\": false}";
         return given()
-                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), TOKEN_PREFIX + githubToken)
+                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), ApiHeaders.TOKEN_PREFIX.getHeaderName() + ACCESS_TOKEN)
                 .header(ApiHeaders.CONTENT_TYPE.getHeaderName(), ApiHeaders.JSON_CONTENT_TYPE.getHeaderName())
                 .body(requestBody)
                 .when()
@@ -46,14 +47,14 @@ public class GitHubApi {
      *
      * @param repoUsername the GitHub username
      * @param repoName     the repository name
-     * @param githubToken  the GitHub access token
      * @return Response object with the response data
      */
-    public static Response repositoryExists(String repoUsername, String repoName, String githubToken) {
+    @Override
+    public Response repositoryExists(String repoUsername, String repoName) {
         return given()
-                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), TOKEN_PREFIX + githubToken)
+                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), ApiHeaders.TOKEN_PREFIX.getHeaderName() + ACCESS_TOKEN)
                 .when()
-                .get(BASE_URL + "/repos/" + repoUsername + "/" + repoName);
+                .get(BASE_URL + GitHubApiPaths.REPO_EXISTS.getPath(repoUsername, repoName));
     }
 
     /**
@@ -61,15 +62,15 @@ public class GitHubApi {
      *
      * @param repoUsername the GitHub username
      * @param repoName     the repository name
-     * @param githubToken  the GitHub access token
      * @param title        the title of the issue
      * @param body         the body of the issue
      * @return Response object with the response data
      */
-    public static Response createIssue(String repoUsername, String repoName, String githubToken, String title, String body) {
+    @Override
+    public Response createIssue(String repoUsername, String repoName, String title, String body) {
         String requestBody = "{\"title\": \"" + title + "\", \"body\": \"" + body + "\"}";
         return given()
-                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), TOKEN_PREFIX + githubToken)
+                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), ApiHeaders.TOKEN_PREFIX.getHeaderName() + ACCESS_TOKEN)
                 .header(ApiHeaders.CONTENT_TYPE.getHeaderName(), ApiHeaders.JSON_CONTENT_TYPE.getHeaderName())
                 .body(requestBody)
                 .when()
@@ -81,28 +82,28 @@ public class GitHubApi {
      *
      * @param repoUsername the GitHub username
      * @param repoName     the repository name
-     * @param githubToken  the GitHub access token
      * @return Response object with the response data
      */
-    public static Response issueExists(String repoUsername, String repoName, String githubToken) {
+    @Override
+    public Response issueExists(String repoUsername, String repoName) {
         return given()
-                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), TOKEN_PREFIX + githubToken)
+                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), ApiHeaders.TOKEN_PREFIX.getHeaderName() + ACCESS_TOKEN)
                 .when()
-                .get(BASE_URL + "/repos/" + repoUsername + "/" + repoName + "/issues?state=open");
+                .get(BASE_URL + GitHubApiPaths.ISSUE_EXISTS.getPath(repoUsername, repoName) + "?state=open");
     }
 
     /**
      * Searches code within repositories.
      *
      * @param query       the search query to look for in code
-     * @param githubToken the GitHub access token
      * @return Response object with the response data
      */
-    public static Response searchCode(String query, String githubToken) {
+    @Override
+    public Response searchCode(String query) {
         return given()
-                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), TOKEN_PREFIX + githubToken)
+                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), ApiHeaders.TOKEN_PREFIX.getHeaderName() + ACCESS_TOKEN)
                 .when()
-                .get(BASE_URL + "/search/code?q=" + query);
+                .get(BASE_URL + GitHubApiPaths.SEARCH_CODE.getPath() + "?q=" + query);
     }
 
     /**
@@ -110,12 +111,12 @@ public class GitHubApi {
      *
      * @param repoUsername the GitHub username
      * @param repoName     the repository name
-     * @param githubToken  the GitHub access token
      * @return Response object with the response data
      */
-    public static Response deleteRepository(String repoUsername, String repoName, String githubToken) {
+    @Override
+    public Response deleteRepository(String repoUsername, String repoName) {
         return given()
-                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), TOKEN_PREFIX + githubToken)
+                .header(ApiHeaders.AUTHORIZATION.getHeaderName(), ApiHeaders.TOKEN_PREFIX.getHeaderName() + ACCESS_TOKEN)
                 .when()
                 .delete(BASE_URL + GitHubApiPaths.DELETE_REPO.getPath(repoUsername, repoName));
     }

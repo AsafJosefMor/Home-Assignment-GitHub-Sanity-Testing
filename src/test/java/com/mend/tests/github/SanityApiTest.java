@@ -1,16 +1,12 @@
 package com.mend.tests.github;
 
-import com.mend.api.GitHubApi;
+import com.mend.api.GitHubApiClient;
 import com.mend.tests.BaseTest;
 import io.restassured.response.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.util.UUID;
 
 /**
  * Sanity tests for GitHub API interactions.
@@ -22,41 +18,12 @@ import java.util.UUID;
  * - Repository cleanup after tests
  */
 public class SanityApiTest extends BaseTest {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(SanityApiTest.class);
-    private String testRepoName;
 
-    /**
-     * Creates a unique repository before the class starts.
-     */
-    @BeforeClass
-    public void createRepo() {
-        // Generate a new unique repository name
-        testRepoName = "test-repo-" + UUID.randomUUID();
-        LOGGER.info("Creating repository: {}", testRepoName);
-
-        Response response = GitHubApi.createRepository(testRepoName, ACCESS_TOKEN);
-        validateResponseTime(response);
-
-        // Assert the repository creation was successful
-        Assert.assertEquals(response.statusCode(), 201, "Repository creation failed!");
-
-        // Assert the repository exists after creation
-        response = GitHubApi.repositoryExists(REPO_USERNAME, testRepoName, ACCESS_TOKEN);
-        validateResponseTime(response);
-        Assert.assertEquals(response.statusCode(), 200, "Repository was created but does not exist!");
-    }
-
-    /**
-     * Cleans up by deleting the created repository after all tests are finished.
-     */
-    @AfterClass(alwaysRun = true)
-    public void cleanupTest() {
-        LOGGER.info("Cleaning up: Deleting repository {}", testRepoName);
-        Response response = GitHubApi.deleteRepository(REPO_USERNAME, testRepoName, ACCESS_TOKEN);
-        validateResponseTime(response);
-
-        // Assert the repository deletion was successful
-        Assert.assertEquals(response.statusCode(), 204, "Failed to delete the test repository: " + testRepoName);
+    @Override
+    public void setApiClient() {
+        apiClient = new GitHubApiClient();
     }
 
     /**
@@ -65,11 +32,8 @@ public class SanityApiTest extends BaseTest {
     @Test
     public void testUserAuthentication() {
         LOGGER.info("Running User Authentication Test");
-        Assert.assertNotNull(ACCESS_TOKEN, "GitHub token is not configured!");
-
-        Response response = GitHubApi.login(ACCESS_TOKEN);
+        Response response = apiClient.login();
         validateResponseTime(response);
-
         Assert.assertEquals(response.statusCode(), 200, "GitHub authentication failed!");
     }
 
@@ -78,9 +42,9 @@ public class SanityApiTest extends BaseTest {
      */
     @Test
     public void testRepositoryExists() {
-        LOGGER.info("Running Repository Existence Test");
+        LOGGER.info("Running Repository Creation Test");
 
-        Response response = GitHubApi.repositoryExists(REPO_USERNAME, testRepoName, ACCESS_TOKEN);
+        Response response = apiClient.repositoryExists(REPO_USERNAME, testRepoName);
         validateResponseTime(response);
 
         Assert.assertEquals(response.statusCode(), 200, "Repository does not exist!");
@@ -94,13 +58,13 @@ public class SanityApiTest extends BaseTest {
         LOGGER.info("Running Issue Creation Test");
 
         String issueTitle = "Test Issue";
-        Response response = GitHubApi.createIssue(REPO_USERNAME, testRepoName, ACCESS_TOKEN, issueTitle, "This is a test issue.");
+        Response response = apiClient.createIssue(REPO_USERNAME, testRepoName, issueTitle, "This is a test issue.");
         validateResponseTime(response);
 
         Assert.assertEquals(response.statusCode(), 201, "Issue creation failed!");
 
         // Assert issue existence
-        response = GitHubApi.issueExists(REPO_USERNAME, testRepoName, ACCESS_TOKEN);
+        response = apiClient.issueExists(REPO_USERNAME, testRepoName);
         validateResponseTime(response);
         Assert.assertEquals(response.statusCode(), 200, "Issue was created but does not exist!");
     }
@@ -113,9 +77,11 @@ public class SanityApiTest extends BaseTest {
         LOGGER.info("Running Code Search Test");
 
         String searchQuery = "public class";
-        Response response = GitHubApi.searchCode(searchQuery, ACCESS_TOKEN);
+        Response response = apiClient.searchCode(searchQuery);
         validateResponseTime(response);
 
+        // Assert that the code search returned results
+        Assert.assertFalse(response.jsonPath().getList("items").isEmpty(), "Code search returned no results!");
         Assert.assertEquals(response.statusCode(), 200, "Code search failed!");
     }
 }
