@@ -78,7 +78,8 @@ public abstract class BaseTest {
     protected void validateResponseTime(Response response) {
         long timeTaken = response.getTime();
         LOGGER.info("Response time: {}ms", timeTaken);
-        Assert.assertTrue(timeTaken < RESPONSE_TIME_THRESHOLD, "Test failed due to slow response time: %dms (Threshold: %dms)");
+        Assert.assertTrue(timeTaken < RESPONSE_TIME_THRESHOLD,
+                "Test failed due to slow response time: " + RESPONSE_TIME_THRESHOLD + "ms");
     }
 
     /**
